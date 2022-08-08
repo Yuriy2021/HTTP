@@ -27,8 +27,7 @@ const requestListener = (req, res) => {
         };
         
         res.writeHead(405);
-        res.end("Method is not allowed");
-            
+        res.end("Method is not allowed");            
     
 };
 const server = http.createServer(requestListener);
