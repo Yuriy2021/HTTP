@@ -6,9 +6,8 @@ const files= [];
 
 const requestListener = (req, res) => {
     
-    if (req.url === '/get') {
-        if (req.method === 'GET') {
-            res.writeHead(200);
+    if (req.url === '/get'&& req.method === 'GET') {
+                res.writeHead(200);
             
                 fs.readdirSync('./Folder').forEach(file => {
                     
@@ -16,13 +15,20 @@ const requestListener = (req, res) => {
                 });
             res.end(`${files}`);
             
+        } else if (req.url ==='/delete'&& req.method === 'DELETE'){
+            res.writeHead(200);
+            res.end('success');
+        } else if (req.url === '/post'&& req.method ==='POST') {
+            res.writeHead(200);
+            res.end('success');
+        } else if (req.url === '/redirect' && req.method === 'GET') {
+            res.writeHead(200);
+            res.end("Server is available on HTTP//localhost/redirected");
         };
+        
         res.writeHead(405);
         res.end("Method is not allowed");
-        
-    }
-    res.writeHead(500);
-    res.end('Internal server error.');
+            
     
 };
 const server = http.createServer(requestListener);
