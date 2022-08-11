@@ -9,12 +9,14 @@ const requestListener = (req, res) => {
     if (req.url === '/get'&& req.method === 'GET') {
                 res.writeHead(200);
             
-                fs.readdirSync('./Folder').forEach(file => {
+                try{
+                    const files = fs.readdirSync('./Folder', 'utf8')
                     
-                    files.push(file);
-                });
-            res.end(`${files}`);
-            
+                    res.end(`${files}`);
+                    } catch (e) {
+                        res.writeHead(500);
+                   }            
+                        
         } else if (req.url ==='/delete'&& req.method === 'DELETE'){
             res.writeHead(200);
             res.end('success');
@@ -22,13 +24,12 @@ const requestListener = (req, res) => {
             res.writeHead(200);
             res.end('success');
         } else if (req.url === '/redirect' && req.method === 'GET') {
-            res.writeHead(200);
-            res.end("Server is available on HTTP//localhost/redirected");
+            res.writeHead(301);
+            res.end('Location:/redirected');
         };
         
         res.writeHead(405);
-        res.end("Method is not allowed");
-            
+        res.end("Method is not allowed");            
     
 };
 const server = http.createServer(requestListener);
