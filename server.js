@@ -24,8 +24,8 @@ const requestListener = (req, res) => {
             res.writeHead(200);
             res.end('success');
         } else if (req.url === '/redirect' && req.method === 'GET') {
-            res.writeHead(301);
-            res.end('Location:/redirected');
+           
+            res.writeHead(301,{'Location':'/redirected'});
         };
         
         res.writeHead(405);
