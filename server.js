@@ -24,15 +24,12 @@ const requestListener = (req, res) => {
             res.writeHead(200);
             res.end('success');
         } else if (req.url === '/redirect' && req.method === 'GET') {
-<<<<<<< HEAD
+
             res.setHeader('Location','/redirected');
             res.writeHead(301);
             
             res.end('Location:/redirected');
-=======
-           
-            res.writeHead(301,{'Location':'/redirected'});
->>>>>>> HW_1
+
         };
         
         res.writeHead(405);
