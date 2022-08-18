@@ -31,13 +31,16 @@ const requestListener = (req, res) => {
             res.writeHead(301);
             res.end("Server is available on HTTP//localhost/redirected");
         }else if (req.url === '/auth'&& req.method === 'POST') {
-            const client = String(req.username);
-            const pass = String(req.password);
-
-            if ( user.username === client && user.password === pass) {
+            let buffer = {};
+            req.on('data',chunk => {
+                buffer += chunk;
+            });
+           if ( user.username === buffer.username && user.password === buffer.password) {
+                console.log(buffer.username);
                 res.writeHead(200);
                 res.end('auth success');
             }else
+            console.log(req.username);
             res.writeHead(404);
             res.end("auth failed");
 ;
