@@ -31,21 +31,24 @@ const requestListener = (req, res) => {
             res.writeHead(301);
             res.end("Server is available on HTTP//localhost/redirected");
         }else if (req.url === '/auth'&& req.method === 'POST') {
-            let buffer = {};
+            let bufer = '';
             req.on('data',chunk => {
-                buffer += chunk;
+                bufer = chunk.toString();
+                const searchParams = new URLSearchParams(bufer);
+                for (const [key, value] of searchParams.entries()) {
+                    console.log(`${key}, ${value}`);
+                    if(key === 'username' && value=== user.username && key === 'password' && value === user.password) {
+                        res.writeHead(200,{'Content-Type':'text/plain', 'Set-Cookie':[`userId=${user.id};MAX_AGE=172800;path=/;`,`authorized=true;MAX_AGE=172800;path=/;`]})
+                    } else {
+                        res.writeHead(400);
+                        res.end('Неверный логин или пароль');
+                    }
+
+                }
+                
             });
-           if ( user.username === buffer.username && user.password === buffer.password) {
-                console.log(buffer.username);
-                res.writeHead(200);
-                res.end('auth success');
-            }else
-            console.log(req.username);
-            res.writeHead(404);
-            res.end("auth failed");
-;
-        }
-        
+           
+        };
         res.writeHead(405);
         res.end("Method is not allowed");
             
