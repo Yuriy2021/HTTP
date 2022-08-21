@@ -39,9 +39,10 @@ const requestListener = (req, res) => {
                     console.log(`${key}, ${value}`);
                     if(key === 'username' && value=== user.username && key === 'password' && value === user.password) {
                         res.writeHead(200,{'Content-Type':'text/plain', 'Set-Cookie':[`userId=${user.id};MAX_AGE=172800;path=/;`,`authorized=true;MAX_AGE=172800;path=/;`]})
+                        
                     } else {
                         res.writeHead(400);
-                        res.end('Неверный логин или пароль');
+                        //res.end('Неверный логин или пароль');
                     }
 
                 }
