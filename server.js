@@ -43,7 +43,7 @@ const requestListener = (req, res) => {
             res.writeHead(200);
             res.end('success');
         } else if (req.url === '/post'&& req.method ==='POST') {
-             if( user.id === authenticated.userId && authenticated.authorized){
+             if( user.id.toString() === authenticated.userId && authenticated.authorized){
             res.writeHead(200);
             res.end('success');
              };
