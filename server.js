@@ -4,12 +4,31 @@ const port = 8000;
 const fs = require ('fs');
 const files= [];
 
+function parseCookies (request) {
+    const list = {};
+    const cookieHeader = request.headers?.cookie;
+    if (!cookieHeader) return list;
+
+    cookieHeader.split(`;`).forEach(function(cookie) {
+        let [ name, ...rest] = cookie.split(`=`);
+        name = name?.trim();
+        if (!name) return;
+        const value = rest.join(`=`).trim();
+        if (!value) return;
+        list[name] = decodeURIComponent(value);
+    });
+
+    return list;
+}
+
 const requestListener = (req, res) => {
     const user = {
         id:123,
         username:'testuser',
         password:'qwerty'
     };
+    const authenticated = parseCookies(req);
+    console.log(authenticated.authorized);
     
     if (req.url === '/get'&& req.method === 'GET') {
                 res.writeHead(200);
@@ -24,8 +43,13 @@ const requestListener = (req, res) => {
             res.writeHead(200);
             res.end('success');
         } else if (req.url === '/post'&& req.method ==='POST') {
+             if( user.id === authenticated.userId && authenticated.authorized){
             res.writeHead(200);
             res.end('success');
+             };
+            res.writeHead(400);
+            
+            
         } else if (req.url === '/redirect' && req.method === 'GET') {
             res.setHeader('Location','/redirected');
             res.writeHead(301);
@@ -34,24 +58,27 @@ const requestListener = (req, res) => {
             let bufer = '';
             req.on('data',chunk => {
                 bufer = chunk.toString();
-                const searchParams = new URLSearchParams(bufer);
-                for (const [key, value] of searchParams.entries()) {
-                    console.log(`${key}, ${value}`);
-                    if(key === 'username' && value=== user.username && key === 'password' && value === user.password) {
-                        res.writeHead(200,{'Content-Type':'text/plain', 'Set-Cookie':[`userId=${user.id};MAX_AGE=172800;path=/;`,`authorized=true;MAX_AGE=172800;path=/;`]})
-                        
-                    } else {
-                        res.writeHead(400);
-                        //res.end('Неверный логин или пароль');
-                    }
-
-                }
-                
-            });
-           
-        };
+                const searchParams = new URLSearchParams(bufer)
+                if (searchParams.has('username')&& searchParams.get('username') === user.username){                    
+                    if (searchParams.has('password') && searchParams.get('password') === user.password){
+                                              
+                        res.writeHead(200, {
+                            'Content-Type': 'text/plain',
+                            'Set-Cookie': [`userId=${user.id};MAX_AGE=172800;path=/;`,`authorized=true;MAX_AGE=172800;path=/;`]
+                        });
+                        res.end('авторизация успешна прошла');
+                    } 
+                } else {
+                    res.writeHead(400);
+                    res.end('Неверный логин или пароль');
+                };  
+              
+            
+            } )
+        } 
+        else {
         res.writeHead(405);
-        res.end("Method is not allowed");
+        res.end("Method is not allowed");}
             
     
 };
