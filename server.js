@@ -44,8 +44,33 @@ const requestListener = (req, res) => {
             res.end('success');
         } else if (req.url === '/post'&& req.method ==='POST') {
              if( user.id.toString() === authenticated.userId && authenticated.authorized){
-            res.writeHead(200);
-            res.end('success');
+            let bufer = '';
+            req.on('data', chunk => {
+                bufer = chunk.toString();
+                const searchParams = new URLSearchParams(bufer);
+                let filename = searchParams.get('filename');
+                let content = searchParams.get('content');
+                if(filename) {
+                    fs.writeFile( `./files/${filename}`, content, (err) => {
+                        if (err) {
+                            res.writeHead(404);
+                            console.log(err);
+                            res.end('File write error' + err);  
+                            
+                        }
+                        else {
+                            console.log("File written successfully\n");
+                            console.log("The written has the following contents:");
+                            console.log(fs.readFileSync(`./files/${filename}`, "utf8"));
+                            res.end(`Файл ./files/${filename} записан`);  
+                        } 
+                    });
+                }
+                else {                           
+                    res.writeHead(400);
+                    res.end('Не указано имя фала');
+                };
+            })
              };
             res.writeHead(400);
             
