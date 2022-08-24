@@ -40,16 +40,20 @@ const requestListener = (req, res) => {
             res.end(`${files}`);
             
         } else if (req.url ==='/delete'&& req.method === 'DELETE'){
+            if( user.id.toString() === authenticated.userId && authenticated.authorized)
             res.writeHead(200);
             res.end('success');
         } else if (req.url === '/post'&& req.method ==='POST') {
              if( user.id.toString() === authenticated.userId && authenticated.authorized){
             let bufer = '';
+            let filename = '';
+            let content = '';
             req.on('data', chunk => {
                 bufer = chunk.toString();
                 const searchParams = new URLSearchParams(bufer);
-                let filename = searchParams.get('filename');
-                let content = searchParams.get('content');
+                filename = searchParams.get('filename');
+                content = searchParams.get('content');
+                console.log(filename);
                 if(filename) {
                     fs.writeFile( `./files/${filename}`, content, (err) => {
                         if (err) {
@@ -71,9 +75,8 @@ const requestListener = (req, res) => {
                     res.end('Не указано имя фала');
                 };
             })
-             };
-            res.writeHead(400);
-            
+            };
+            res.writeHead(400);           
             
         } else if (req.url === '/redirect' && req.method === 'GET') {
             res.setHeader('Location','/redirected');
