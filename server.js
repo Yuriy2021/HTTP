@@ -40,9 +40,34 @@ const requestListener = (req, res) => {
             res.end(`${files}`);
             
         } else if (req.url ==='/delete'&& req.method === 'DELETE'){
-            if( user.id.toString() === authenticated.userId && authenticated.authorized)
-            res.writeHead(200);
-            res.end('success');
+            if( user.id.toString() === authenticated.userId && authenticated.authorized){
+                let deleteFile = '';
+
+                req.on('data', chunk => {
+                    bufer = chunk.toString();
+                    const searchParams = new URLSearchParams(bufer);
+                    deleteFile = `./files/${searchParams.get('filename')}`;
+                    if (fs.existsSync(deleteFile)) {
+                        fs.unlink(deleteFile, (err) => {
+                            if (err) {
+                                res.writeHead(500);
+                                res.end('Did not unlink file' + err);
+                                console.log(err);
+                            }
+                            
+                            console.log('deleted');
+                            res.end('success delete');
+                        })
+                    }
+                    else {
+                        res.writeHead(500);
+                        res.end('No such file' + deleteFile);
+                        console.log('No such file' + deleteFile);
+                    }
+                });
+            }
+            res.writeHead(405);
+            res.end('HTTP method is not allowed');
         } else if (req.url === '/post'&& req.method ==='POST') {
              if( user.id.toString() === authenticated.userId && authenticated.authorized){
             let bufer = '';
